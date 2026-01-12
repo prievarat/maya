@@ -292,7 +292,7 @@
                 <br><br>
                 Find the <strong>5 inaccuracies</strong> hidden in the text. Correct them to decrypt the system password.
                 <br><br>
-                <span style="color:#D92D20; font-weight:bold;">WARNING: Incorrect answers reduce remaining time by 60 seconds.</span>
+                <span style="color:#D92D20; font-weight:bold;">WARNING: Mistakes cost 1 minute of remaining time.</span>
             </p>
             <button class="btn-start" onclick="startMission()">ACCEPT MISSION</button>
         </div>
@@ -350,12 +350,12 @@
     </div>
 
     <script>
-       
-        const _secret = ""aHR0cHM6Ly9wcmVpdmFyYXQuZ2l0aHViLmlvL21heWFfc3RhZ2UyLw==";
+        // --- SECURE URL HANDLER ---
+        const _secret = "aHR0cHM6Ly9wcmVpdmFyYXQuZ2l0aHViLmlvL21heWFfc3RhZ2UyLw==";
         
         const answers = { "1": "35TH", "2": "1917", "3": "BERLINER", "4": "MARILYN", "5": "1963" };
         let solved = 0;
-        let timeRemaining = 600; // 10 minutes
+        let timeRemaining = 600; // 10 minutes (600 seconds)
         let timer;
 
         function startMission() {
@@ -396,19 +396,19 @@
             if (e.key === 'Enter') {
                 const val = input.value.trim().toUpperCase();
                 if (val === answers[currentGlitch.dataset.id]) {
+                    // CORRECT
                     currentGlitch.textContent = val;
                     currentGlitch.classList.add('fixed');
                     popover.style.display = 'none';
                     solved++;
                     document.getElementById('progress-bar').style.width = (solved / 5 * 100) + '%';
+                    
                     if (solved === 5) {
-                        clearInterval(timer);
-                        const btn = document.getElementById('next-stage-btn');
-                        btn.classList.remove('hidden');
-                        btn.href = atob(_secret);
+                        winGame();
                     }
                 } else {
-                    timeRemaining -= 60; // 1 minute penalty
+                    // WRONG - PENALTY
+                    timeRemaining -= 60; 
                     popover.classList.add('shake');
                     document.getElementById('timer-block').classList.add('penalty');
                     setTimeout(() => {
@@ -420,6 +420,21 @@
             }
         });
 
+        function winGame() {
+            clearInterval(timer);
+            const btn = document.getElementById('next-stage-btn');
+            const targetURL = atob(_secret);
+            
+            btn.href = targetURL;
+            btn.classList.remove('hidden');
+            
+            // Redirect after 2.5 seconds automatically
+            setTimeout(() => {
+                window.location.href = targetURL;
+            }, 2500);
+        }
+
+        // Intro Animation
         const introTxt = `Monday morning. 8:15 AM.\nMaya’s seat is empty.\n\nYou found a note stuck to her desk:\n"LOG ON TO MY LAPTOP. READ MY BLOG.\nTHE TRUTH IS IN THE PAST."`;
         let charIdx = 0;
         function type() {
@@ -435,6 +450,4 @@
         lucide.createIcons();
     </script>
 </body>
-
 </html>
-
