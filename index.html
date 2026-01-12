@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PROJECT KILLSWITCH | STAGE 1</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=JetBrains+Mono:wght@500;700&family=Merriweather:ital,wght@0,300;0,700;1,300&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            /* Palette */
+            --primary-300: #F9C97A;
+            --primary-500: #F4A329;
+            --primary-700: #B45309;
+            --secondary-300: #7EDAD6;
+            --secondary-500: #2BB6B4;
+            --secondary-700: #0F766E;
+            --bg: #FFF7F2;
+            --surface: #FFFFFF;
+            --text: #1F2937;
+            --text-muted: #6B7280;
+            --error: #D92D20;
+            --success: #2F9E44;
+            --border: #E6E9EF;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            background-image: 
+                radial-gradient(var(--primary-300) 0.5px, transparent 0.5px),
+                radial-gradient(var(--primary-300) 0.5px, var(--bg) 0.5px);
+            background-size: 24px 24px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        /* Narrative Intro Overlay */
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+            transition: opacity 0.5s;
+        }
+
+        .typewriter {
+            font-family: 'JetBrains Mono', monospace;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: var(--primary-700);
+            font-size: 1.1rem;
+            min-height: 150px;
+        }
+
+        /* Mission Briefing Box */
+        #mission-brief {
+            background: white;
+            border: 2px solid var(--primary-500);
+            padding: 2rem;
+            border-radius: 12px;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(244, 163, 41, 0.2);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-out;
+            display: none; 
+        }
+        
+        #mission-brief.visible {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+
+        .mission-title {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            color: var(--secondary-700);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-start {
+            margin-top: 1.5rem;
+            padding: 1rem 2.5rem;
+            background: var(--primary-500);
+            color: white;
+            border: none;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 15px rgba(244, 163, 41, 0.3);
+        }
+
+        /* Laptop Container */
+        #laptop-frame {
+            width: 90%;
+            max-width: 900px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+            padding: 20px 20px 40px 20px;
+            position: relative;
+            display: none; 
+            margin: 40px auto;
+        }
+
+        #laptop-screen {
+            background: #fdfdfd;
+            border-radius: 8px;
+            min-height: 600px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- Blog UI --- */
+        .blog-wrapper {
+            flex: 1;
+            padding: 40px 60px 100px 60px;
+            overflow-y: auto;
+        }
+
+        .blog-header {
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        .blog-header h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 28px;
+            margin: 0;
+            color: var(--text);
+        }
+        
+        .blog-content {
+            font-family: 'Merriweather', serif;
+            font-size: 19px;
+            line-height: 1.8;
+            color: #374151;
+        }
+        
+        .blog-content p { margin-bottom: 1.5rem; }
+
+        .stealth-glitch {
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            position: relative;
+            border-radius: 3px;
+        }
+
+        .stealth-glitch:hover {
+            background-color: rgba(244, 163, 41, 0.2);
+            border-bottom-color: var(--primary-500);
+        }
+
+        .stealth-glitch.fixed {
+            color: var(--secondary-700);
+            font-weight: 600;
+            background: rgba(43, 182, 180, 0.15);
+            border-bottom: none;
+            pointer-events: none;
+            padding: 0 4px;
+        }
+
+        #input-popover {
+            position: absolute;
+            background: var(--surface);
+            border: 2px solid var(--primary-500);
+            padding: 8px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 50;
+            transform: translate(-50%, -120%);
+        }
+
+        #input-popover input {
+            font-family: 'JetBrains Mono', monospace;
+            text-transform: uppercase;
+            border: none;
+            outline: none;
+            width: 160px;
+            font-size: 18px;
+            text-align: center;
+            color: var(--primary-700);
+            font-weight: bold;
+        }
+
+        .system-footer {
+            position: sticky;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid var(--border);
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 40;
+            gap: 20px;
+        }
+
+        .progress-block { flex: 1; max-width: 250px; }
+        .progress-track { width: 100%; height: 8px; background: #E5E7EB; border-radius: 4px; overflow: hidden; }
+        #progress-bar { width: 0%; height: 100%; background: var(--secondary-500); transition: width 0.6s; }
+
+        .timer-block {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #FEF2F2;
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: 1px solid #FECACA;
+            color: #DC2626;
+        }
+
+        .timer-block.penalty { background-color: #EF4444; color: white; transform: scale(1.1); }
+        #timer-display { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 18px; }
+
+        #game-over {
+            position: absolute;
+            inset: 0;
+            background: #000;
+            color: #D92D20;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            font-family: 'JetBrains Mono', monospace;
+            text-align: center;
+        }
+
+        .hidden { display: none !important; }
+        .shake { animation: shake 0.4s; }
+        @keyframes shake {
+            0%, 100% { transform: translate(-50%, -120%) translateX(0); }
+            20% { transform: translate(-50%, -120%) translateX(-4px); }
+            40% { transform: translate(-50%, -120%) translateX(4px); }
+        }
+
+        #next-stage-btn {
+            background: var(--secondary-700);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="intro-overlay">
+        <div class="typewriter" id="intro-text"></div>
+        <div id="mission-brief">
+            <div class="mission-title"><i data-lucide="crosshair"></i> Mission Directive</div>
+            <p style="margin-bottom: 20px; line-height: 1.6; color: #4B5563;">
+                Your objective is to restore the corrupted historical data on Maya's laptop.
+                <br><br>
+                Find the <strong>5 inaccuracies</strong> hidden in the text. Correct them to decrypt the system password.
+                <br><br>
+                <span style="color:#D92D20; font-weight:bold;">WARNING: Incorrect answers reduce remaining time by 60 seconds.</span>
+            </p>
+            <button class="btn-start" onclick="startMission()">ACCEPT MISSION</button>
+        </div>
+    </div>
+
+    <div id="laptop-frame">
+        <div id="laptop-screen">
+            <div id="game-over">
+                <i data-lucide="alert-triangle" style="width: 64px; height: 64px; margin-bottom: 20px;"></i>
+                <h1>MISSION FAILED</h1>
+                <p>SYSTEM LOCKOUT</p>
+                <button onclick="location.reload()" style="margin-top: 30px; background: #D92D20; color: white; border: none; padding: 10px 20px; cursor: pointer;">TRY AGAIN</button>
+            </div>
+
+            <div class="blog-wrapper">
+                <div class="blog-header">
+                    <h1>Maya's History Blog: The New Frontier</h1>
+                    <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 8px;">
+                        <span>Posted: Nov 22, 2024</span> | <span>By: Maya K.</span>
+                    </div>
+                </div>
+
+                <div class="blog-content">
+                    <p>
+                        John F. Kennedy, or JFK, remains one of the most iconic figures in American history. 
+                        He served as the <span class="stealth-glitch" data-id="1">40th</span> President of the United States. 
+                        Born in <span class="stealth-glitch" data-id="2">1924</span> in Massachusetts, he was the youngest person ever elected to the office.
+                    </p>
+                    <p>
+                        During the Cold War, he famously traveled to Germany to support the people of Berlin. Standing before a massive crowd, he declared his solidarity with the famous words: 
+                        'Ich bin ein <span class="stealth-glitch" data-id="3">Frankfurter</span>!' 
+                        On a more personal level, he was often linked to Hollywood, specifically rumors of an affair with the famous actress 
+                        <span class="stealth-glitch" data-id="4">Michelle</span> Monroe. 
+                        Tragically, his presidency ended in Dallas, Texas, in <span class="stealth-glitch" data-id="5">1975</span>. 
+                        His legacy continues to inspire people to 'ask what they can do for their country.'
+                    </p>
+                </div>
+            </div>
+
+            <div id="input-popover"><input type="text" id="glitch-input" autocomplete="off"></div>
+
+            <div class="system-footer">
+                <div class="timer-block" id="timer-block">
+                    <i data-lucide="timer" style="width: 16px;"></i>
+                    <span id="timer-display">10:00</span>
+                </div>
+                <div class="progress-block">
+                    <div class="progress-track"><div id="progress-bar"></div></div>
+                </div>
+                <div id="password-gate">
+                    <a href="#" id="next-stage-btn" class="hidden">PROCEED TO STAGE 2 <i data-lucide="arrow-right" style="width:14px"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hashed URL for: https://prievarat.github.io/maya_stage2/
+        const _secret = "aHR0cHM6Ly9wcmVpdmFyYXQuZ2l0aHViLmlvL21heWFfc3RhZ2UyLw==";
+        
+        const answers = { "1": "35TH", "2": "1917", "3": "BERLINER", "4": "MARILYN", "5": "1963" };
+        let solved = 0;
+        let timeRemaining = 600; // 10 minutes
+        let timer;
+
+        function startMission() {
+            document.getElementById("intro-overlay").style.display = 'none';
+            document.getElementById("laptop-frame").style.display = 'block';
+            timer = setInterval(tick, 1000);
+        }
+
+        function tick() {
+            if (timeRemaining <= 0) {
+                clearInterval(timer);
+                document.getElementById('game-over').style.display = 'flex';
+                return;
+            }
+            timeRemaining--;
+            let m = Math.floor(timeRemaining / 60);
+            let s = timeRemaining % 60;
+            document.getElementById('timer-display').textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        const input = document.getElementById('glitch-input');
+        const popover = document.getElementById('input-popover');
+        let currentGlitch = null;
+
+        document.querySelectorAll('.stealth-glitch').forEach(el => {
+            el.addEventListener('click', () => {
+                currentGlitch = el;
+                const rect = el.getBoundingClientRect();
+                const screen = document.getElementById('laptop-screen').getBoundingClientRect();
+                popover.style.top = (rect.top - screen.top - 10) + 'px';
+                popover.style.left = (rect.left - screen.left + rect.width / 2) + 'px';
+                popover.style.display = 'block';
+                input.focus();
+            });
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const val = input.value.trim().toUpperCase();
+                if (val === answers[currentGlitch.dataset.id]) {
+                    currentGlitch.textContent = val;
+                    currentGlitch.classList.add('fixed');
+                    popover.style.display = 'none';
+                    solved++;
+                    document.getElementById('progress-bar').style.width = (solved / 5 * 100) + '%';
+                    if (solved === 5) {
+                        clearInterval(timer);
+                        const btn = document.getElementById('next-stage-btn');
+                        btn.classList.remove('hidden');
+                        btn.href = atob(_secret);
+                    }
+                } else {
+                    timeRemaining -= 60; // 1 minute penalty
+                    popover.classList.add('shake');
+                    document.getElementById('timer-block').classList.add('penalty');
+                    setTimeout(() => {
+                        popover.classList.remove('shake');
+                        document.getElementById('timer-block').classList.remove('penalty');
+                    }, 400);
+                }
+                input.value = '';
+            }
+        });
+
+        const introTxt = `Monday morning. 8:15 AM.\nMaya’s seat is empty.\n\nYou found a note stuck to her desk:\n"LOG ON TO MY LAPTOP. READ MY BLOG.\nTHE TRUTH IS IN THE PAST."`;
+        let charIdx = 0;
+        function type() {
+            if (charIdx < introTxt.length) {
+                document.getElementById("intro-text").innerHTML += introTxt[charIdx] === '\n' ? '<br>' : introTxt[charIdx];
+                charIdx++;
+                setTimeout(type, 35);
+            } else {
+                setTimeout(() => document.getElementById("mission-brief").classList.add("visible"), 600);
+            }
+        }
+        window.onload = type;
+        lucide.createIcons();
+    </script>
+</body>
+</html>
